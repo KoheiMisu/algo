@@ -36,6 +36,7 @@ echo "処理時間：" . ($end - $start) . "秒"."\n";
 
 function searchMinKey($data)
 {
+    //先頭要素のキーを取得する
     $indexMin = array_search(current($data), $data);
 
     foreach ($data as $key => $value) {
