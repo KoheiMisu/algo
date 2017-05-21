@@ -272,24 +272,33 @@ class ChainLogic implements CutLogic
 class Cost
 {
     /**
-     * @var array
+     * @var null|int
      */
-    private $results=[];
+    private $result = null;
 
     /**
      * @return int|bool
      */
     public function getMinCost()
     {
-        return min($this->results);
+        return $this->result;
     }
 
     /**
+     * 事前に詰められてた値と比較して小さければresultに格納するようにする
+     *
      * @param int $cost
      */
     public function setCost(int $cost)
     {
-        $this->results[] = $cost;
+        if (!$this->result) {
+            $this->result = $cost;
+            return;
+        }
+
+        if ($cost < $this->result) {
+            $this->result = $cost;
+        }
     }
 }
 
