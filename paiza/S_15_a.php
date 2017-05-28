@@ -77,7 +77,7 @@ class StringAttacher
             $this->level,
             $this->start,
             $this->end,
-            ) = explode(" ", '9 1 2'); // trim(fgets(STDIN))
+            ) = explode(" ", trim(fgets(STDIN))); // trim(fgets(STDIN))
 
         $this->setStartAndEnd();
 
@@ -128,7 +128,7 @@ class StringAttacher
         $prevLevelString = $this->levelStrings[$nowLevel-1];
 
         $strCount = ($prevLevelString->getCount() * 2) + 3;
-        $str = "A" . ($nowLevel-1) . "B" . ($nowLevel-1) . "C";
+        $str = "A|" . ($nowLevel-1) . "|B|" . ($nowLevel-1) . "|C";
 
         return new LevelString($str, $strCount);
     }
@@ -158,15 +158,13 @@ class StringAttacher
         $targetString = $nowLevelString->getString();
         $prevLevel = --$this->level;
 
-        var_dump($targetString);
-
         while (preg_match('/' . $prevLevel . '/', $targetString)) {
 
             $prevLevelString = $this->levelStrings[$prevLevel];
 
             $replaceStringIndex = 0;
 
-            $tmp = str_split($targetString);
+            $tmp = preg_split('/\|/', $targetString);
 
             $replaceFlg = true;
 
@@ -200,7 +198,7 @@ class StringAttacher
                         }
                     }
 
-                    if ($this->start >= $replaceStringIndex) {
+                    if ($this->start >= $replaceStringIndex && $prevLevelString) {
                         $tmp[$key] =  $prevLevelString->getString();
                     }
 
@@ -214,8 +212,6 @@ class StringAttacher
             $nowLevelString = $this->levelStrings[$prevLevel];
             --$prevLevel;
         }
-
-        var_dump($targetString);
 
         return $targetString;
     }
