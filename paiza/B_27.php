@@ -1,32 +1,75 @@
 <?php
 
 /**
- * refs https://paiza.jp/challenges/27/page/problem
+ * refs https://paiza.jp/challenges/106/show
+ *
+ * カードが残り二枚になった時点でゲーム終了、加算
  */
 
-class Schedule
+class Card
 {
     /**
-     * @var array
+     * @var int
      */
-    private $event = [];
+    private $number;
 
     /**
-     * Schedule constructor.
+     * Card constructor.
+     * @param int $number
      */
-    public function __construct()
+    public function __construct(int $number)
     {
-        $this->setEvent();
+        $this->number = $number;
     }
 
     /**
-     * Member:0 or Event:0
+     * @return int
+     */
+    public function getNumber(): int
+    {
+        return $this->number;
+    }
+}
+
+/**
+ * Cardの集合を扱う
+ *
+ * Class Table
+ */
+class Table
+{
+    private $cards;
+
+    /**
+     * Table constructor.
      *
+     * @param int $length 縦
+     * @param int $side 横
+     */
+    public function __construct(int $length, int $side)
+    {
+        for ($i = 1; $i <= $length; $i++) {
+            $sideValues = explode(' ', trim(fgets(STDIN))); // trim(fgets(STDIN))
+
+            for ($j = 1; $j <= $side; $j++) {
+                $this->cards[$i][$j] = new Card((int)$sideValues[$j-1]);
+            }
+        }
+    }
+
+    /**
      * @return bool
      */
-    public function isEmpty(): bool
+    public function isCardSame(): bool
     {
-        if (count($this->event) === 0) {
+        list(
+            $firstLength,
+            $firstSide,
+            $secondLength,
+            $secondSide,
+            ) = explode(' ', trim(fgets(STDIN)));
+
+        if ($this->getCardNumber($firstLength, $firstSide) === $this->getCardNumber($secondLength, $secondSide)) {
             return true;
         }
 
@@ -34,160 +77,128 @@ class Schedule
     }
 
     /**
-     * @return void
-     */
-    private function setEvent()
-    {
-        $inputLines = trim(fgets(STDIN));
-        list($memberCount, $eventCount) = explode(" ", $inputLines);
-
-        if ($memberCount === 0 || $eventCount ===0) {
-            return;
-        }
-
-        while ($inputLines = trim(fgets(STDIN))) {
-            $profits = explode(" ", $inputLines);
-            $this->event[] = new Event($profits);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getEvent(): array
-    {
-        return $this->event;
-    }
-}
-
-class Event
-{
-    /**
-     * @var int|float
-     */
-    private $profit;
-
-    /**
-     * Event constructor.
-     * @param array $profits
-     */
-    public function __construct(array $profits)
-    {
-        $this->setProfit($profits);
-    }
-
-    /**
-     * @param array $profits
-     */
-    private function setProfit(array $profits)
-    {
-        $this->profit = array_sum($profits);
-    }
-
-    /**
-     * @return int|float
-     */
-    public function getProfit()
-    {
-        return $this->profit;
-    }
-}
-
-interface CalculateResultInterface
-{
-    /**
-     * @param int $value
-     * @return void
-     */
-    public function setResult(int $value);
-
-    /**
+     * @param string $length
+     * @param string $side
      * @return int
      */
-    public function getResult(): int;
+    private function getCardNumber(string $length, string $side): int
+    {
+        $card = $this->cards[$length][$side];
+        return $card->getNumber();
+    }
 }
 
-class Profit implements CalculateResultInterface
+/**
+ * Class Player
+ */
+class Player
 {
     /**
      * @var int
      */
-    private $value = 0;
+    private $cardCount = 0;
 
     /**
-     * @param int $value
+     * @param int $count
      */
-    public function setResult(int $value)
+    public function addCardCount(int $count)
     {
-        $this->value = $value;
+        $this->cardCount = $this->cardCount + $count;
     }
 
-    public function getResult(): int
+    /**
+     * @return int
+     */
+    public function getCardCount(): int
     {
-        if ($this->value < 0) {
-            return 0;
-        }
-
-        return $this->value;
+        return $this->cardCount;
     }
 }
 
-
-class Calculator
+class Game
 {
     /**
-     * @var Schedule
+     * @var Table
      */
-    private $schedule;
+    private $table;
 
     /**
-     * @var CalculateResultInterface
+     * @var Player[]
      */
-    private $calculateResult;
+    private $players;
 
     /**
-     * Calculator constructor.
-     * @param Schedule $schedule
-     * @param CalculateResultInterface $calculateResult
+     * Game constructor.
      */
-    public function __construct(Schedule $schedule, CalculateResultInterface $calculateResult)
+    public function __construct()
     {
-        $this->schedule = $schedule;
-        $this->calculateResult = $calculateResult;
+        $this->initializeGame();
     }
 
     /**
-     * @return CalculateResultInterface
+     * @return void
      */
-    public function calculateProfit()
+    private function initializeGame()
     {
-        if ($this->schedule->isEmpty()) {
-            $this->calculateResult->setResult(0);
-            return $this->calculateResult;
+        list(
+            $length,
+            $side,
+            $playerCount,
+            ) = explode(' ', trim(fgets(STDIN))); // trim(fgets(STDIN))
+
+        $this->table = new Table((int)$length, (int)$side);
+
+        while ($playerCount !== 0) {
+            --$playerCount;
+
+            $this->players[] = new Player();
         }
+    }
 
-        $profit = 0;
+    /**
+     * @retunr void
+     */
+    public function boot()
+    {
+        $playerNumber = 0;
+        $historyLine = trim(fgets(STDIN));
 
-        foreach ($this->schedule->getEvent() as $event) {
-            if ($event->getProfit() > 0) {
-                $profit += $event->getProfit();
+        /**
+         * ゲーム開始
+         */
+        for ($i = 0; $i < $historyLine; $i++) {
+            if($this->table->isCardSame()) {
+                $player = $this->players[$playerNumber];
+                $player->addCardCount(2);
+            } else {
+                $playerNumber = $this->refreshPlayerNumber($playerNumber);
             }
         }
 
-        $this->calculateResult->setResult($profit);
+        /**
+         * 結果
+         */
+        foreach ($this->players as $player) {
+            echo $player->getCardCount() . PHP_EOL;
+        }
+    }
 
-        return $this->calculateResult;
+    /**
+     * @param int $playerNumber
+     * @return int
+     */
+    private function refreshPlayerNumber(int $playerNumber): int
+    {
+        ++$playerNumber;
+
+        if (isset($this->players[$playerNumber])) {
+            return $playerNumber;
+        }
+
+        return 0;
     }
 }
 
-$profit = new Profit();
+$game = new Game();
 
-$schedule = new Schedule();
-
-$calculator = new Calculator($schedule, $profit);
-
-$result = $calculator->calculateProfit();
-
-echo $result->getResult();
-
-
+$game->boot();
