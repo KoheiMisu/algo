@@ -139,15 +139,11 @@ class Rectangle implements FallenObjectInterface
                 break;
 
             default:
-                for ($x = $originX; $x <= $limitX; $x++) {
-                    $this->figuredCoordinates[] = [$x => $originY];
+                for ($y = $limitY - 1; $y <= $limitY; $y++) {
+                    for ($x = $originX; $x <= $limitX; $x++) {
+                        $this->figuredCoordinates[] = [$x => $y];
+                    }
                 }
-
-                for ($y = $limitY; $y <= $limitY; $y++) {
-                    $this->figuredCoordinates[] = [$originX => $y];
-                }
-
-                $this->figuredCoordinates[] = [$limitX => $limitY];
         }
     }
 
