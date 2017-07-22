@@ -64,6 +64,12 @@ interface FallenObjectInterface
      * @return void
      */
     public function setFiguredCoordinates($origin);
+
+    public function getWidth();
+
+    public function getHeight();
+
+    public function getOffset();
 }
 
 class Rectangle implements FallenObjectInterface
@@ -227,7 +233,7 @@ class Screen
      *
      * @return array
      */
-    private function calcOrigin($fallenObject)
+    private function calcOrigin(FallenObjectInterface $fallenObject)
     {
         $y = $this->history->getHeight($fallenObject);
 
@@ -251,7 +257,7 @@ class History
         }
     }
 
-    public function getHeight($fallenObject)
+    public function getHeight(FallenObjectInterface $fallenObject)
     {
         $y = $this->coordinates[$fallenObject->getOffset()];
 
@@ -267,12 +273,12 @@ class History
         return $y;
     }
 
-    public function setHeight($fallenObject)
+    public function setHeight(FallenObjectInterface $fallenObject)
     {
         // 上書きする範囲の配列
         $arr = array_slice($this->coordinates, $fallenObject->getOffset(), ($fallenObject->getOffset() + $fallenObject->getWidth()));
 
-        // 範囲内の最大値を取得
+        // 範囲内の最大値を取得(この値を基準としてもっておかないと高さがずれる)
         $baseValue = max($arr);
 
         for ($x = $fallenObject->getOffset(); $x < ($fallenObject->getOffset() + $fallenObject->getWidth()); $x++) {
@@ -290,3 +296,34 @@ list(
 $Simulation = new Simulation($screenHeight, $screenWidth, $fallenObjectCount);
 
 $Simulation->output();
+
+/**
+ * 気になったこと
+ *
+ * interfaceってどこまで持たせるべき?objectが外部クラスで使うものはinterfaceでまとめておくべき？
+ *
+ * こういうのやる時は型で縛っとかないと辛い === 使いたい
+ *
+ * コマンドラインからの引数とかstringだけどキャストするべきだよなー
+ * 型のある言語だとこういうのはutilクラス作ってキャストやるんかな
+ *
+ * factory クラス作るべき?
+ *
+ * テストをしやすくする設計
+ *
+ * interfaceでごちゃごちゃして時間くわないようにするためにはどうするか
+ *
+ * 各クラスの役割や命名は適切か
+ *
+ * 配列操作系もutilかtraitにしたい。今どきの拡張方法でいえばtraitなのかな
+ *
+ * こういうのをレビューのポイントとして共有できていれば
+ * 効率よくPRがこなせそう
+ * そのときどきによってPRの観点が異なってるのは、コードの品質を保つ上でよろしくないので
+ *
+ * Screenに責務がよりがちだなぁ
+ *
+ * setFiguredCoordinates もうまくやりたい
+ *
+ * このコードで読みにくい部分はどこなのか
+ */
