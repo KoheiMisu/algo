@@ -35,7 +35,7 @@ class Simulation
             '2, 2, 4',
             '2, 2, 3',
             '2, 2, 5',
-            '2, 6, 2',
+            '3, 6, 2',
             '2, 2, 6',
             '2, 2, 1',
             '2, 2, 7',
@@ -159,7 +159,7 @@ class Rectangle implements FallenObjectInterface
                 break;
 
             default:
-                for ($y = $limitY - 1; $y <= $limitY; $y++) {
+                for ($y = $originY; $y <= $limitY; $y++) {
                     for ($x = $originX; $x <= $limitX; $x++) {
                         $this->figuredCoordinates[] = [$x => $y];
                     }
