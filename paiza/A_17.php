@@ -307,12 +307,17 @@ class History
     }
 }
 
-list(
-    $screenHeight,
-    $screenWidth,
-    $fallenObjectCount,
-    ) = [10, 10, 4]; // explode(" ", trim(fgets(STDIN)));
+//list(
+//    $screenHeight,
+//    $screenWidth,
+//    $fallenObjectCount,
+//    ) = [10, 10, 4]; // explode(" ", trim(fgets(STDIN)));
+//
+//$Simulation = new Simulation($screenHeight, $screenWidth, $fallenObjectCount);
+//
+//$Simulation->output();
 
-$Simulation = new Simulation($screenHeight, $screenWidth, $fallenObjectCount);
+$arr[1][2] = 'a';
+$arr[1][3] = 'a';
 
-$Simulation->output();
+var_dump($arr);

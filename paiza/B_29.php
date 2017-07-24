@@ -65,13 +65,6 @@ class Land
     }
 }
 
-class Distance
-{
-    private $index;
-
-    private $value;
-}
-
 class Calculator
 {
     /**

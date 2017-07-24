@@ -329,6 +329,3 @@ list(
 $Game = new Game((int)$side , (int)$length, (int)$logCount);
 
 $Game->parsePosition();
-
-
-
